@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # Логи
 *.log
 logs/
@@ -46,3 +47,14 @@ package-lock.json
 # Минифицированные файлы (можно убрать если нужны)
 # *.min.js
 # *.min.css
+=======
+*.log
+.env
+config.php
+wp-config.php
+cache/
+temp/
+tmp/
+.DS_Store
+Thumbs.db
+>>>>>>> origin/main
