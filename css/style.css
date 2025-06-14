@@ -1,0 +1,65 @@
+    body {
+      font-family: 'Comfortaa', Arial, sans-serif;
+      background-color: #fdf6ee;
+      margin: 0;
+      padding: 0;
+      text-align: center;
+    }
+    .screen { display: none; padding: 2rem; }
+    .active { display: block; }
+    input, button, textarea, select {
+      font-size: 1.1rem;
+      padding: 0.7rem;
+      margin: 1rem 0;
+      border-radius: 12px;
+      border: 1px solid #ccc;
+    }
+    .avatar { width: 170px; border-radius: 30%; margin-bottom: 1rem; box-shadow:0 0 18px #ffd19f88;}
+    #chat-container, #volunteer-chat-container {
+      background: #fff;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 0 20px rgba(0,0,0,0.08);
+      max-width: 500px;
+      margin: 30px auto 0 auto;
+      display: flex;
+      flex-direction: column;
+    }
+    #chat, #chat-vol-messages {
+      height: 220px;
+      overflow-y: auto;
+      padding: 10px;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      background: #fafafa;
+      margin-bottom: 15px;
+      text-align: left;
+    }
+    .message { margin-bottom: 10px; word-wrap: break-word; }
+    .user { text-align: right; color: #198754; }
+    .bot { text-align: left; color: #0050b3; }
+    #controls, #vol-controls { display: flex; gap: 6px; }
+    #input, #chat-vol-input { flex-grow: 1; font-size: 1rem; padding: 10px; }
+    button { padding: 10px 16px; cursor: pointer; }
+    textarea { width: 85%; }
+    /* Модальные окна */
+    #requests-modal, #request-detail-modal {
+      display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+      background: #fffefdbf; z-index: 9999; overflow: auto;
+    }
+    .modal-content {
+      max-width: 500px; margin: 40px auto; background: #fff;
+      border-radius: 12px; padding: 24px; box-shadow: 0 0 18px #0001;
+    }
+    .requests-list-item {
+      padding:10px;border-bottom:1px solid #eee;cursor:pointer;text-align:left;
+    }
+    .requests-list-item:hover {background:#f9f2e7;}
+    /* Volunteer tasks */
+    .taskcard {margin-bottom:10px;padding:10px 15px;border-radius:9px;border:1px solid #eee;text-align:left;box-shadow:0 0 7px #fff4;}
+    .taskcat {font-weight:bold; color:#c76a13;}
+    .taskcity {color:#666;}
+    .taskbtn {margin-top:5px;}
+    /* Фильтры */
+    .task-filters {display:flex;gap:8px;flex-wrap:wrap;margin-bottom:10px;}
+    .task-filters input, .task-filters select {margin:0;}

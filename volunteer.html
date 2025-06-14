@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tatani - Кабинет волонтёра</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Экран регистрации волонтёра -->
+  <div id="screen-volunteer-registration" class="screen active">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Анкета волонтёра</h2>
+    <input id="volName" placeholder="Имя" /><br>
+    <input id="volPhone" placeholder="Телефон" /><br>
+    <input id="volCity" placeholder="Город" /><br>
+    <select id="volFormat">
+      <option value="">Формат помощи</option>
+      <option value="Онлайн">Онлайн</option>
+      <option value="Оффлайн">Оффлайн</option>
+      <option value="Оба">Оба</option>
+    </select><br>
+    <textarea id="volSkills" placeholder="Какие задачи готовы решать?"></textarea><br>
+    <textarea id="volGoal" placeholder="Что хотите получить, зачем пришли?"></textarea><br>
+    <button id="submitVolunteerBtn">Зарегистрироваться</button>
+    <button onclick="goHome()">🏠 На главную</button>
+  </div>
+
+  <!-- Кабинет волонтёра -->
+  <div id="screen-volunteer-cabinet" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Кабинет волонтёра</h2>
+    
+    <!-- Чат с ИИ вверху -->
+    <div style="margin-bottom: 30px;">
+      <h3>Чат с ИИ помощником</h3>
+      <div id="volChat" style="height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: #fafafa; text-align: left;"></div>
+      <div style="display: flex; gap: 10px;">
+        <input id="chat-vol-input" type="text" placeholder="Задайте вопрос ИИ..." style="flex: 1;"/>
+        <button id="sendVolunteerChatBtn">Отправить</button>
+        <button id="startVolunteerVoiceBtn">🎤</button>
+      </div>
+    </div>
+    
+    <!-- Доступные задачи внизу -->
+    <div>
+      <h3>Доступные задачи</h3>
+      <div class="task-filters">
+        <select id="filter-category">
+          <option value="">Все категории</option>
+          <option value="Покупка">Покупка</option>
+          <option value="Доставка">Доставка</option>
+          <option value="Общение">Общение</option>
+          <option value="Помощь по дому">Помощь по дому</option>
+        </select>
+        <select id="filter-format">
+          <option value="">Любой формат</option>
+          <option value="Онлайн">Онлайн</option>
+          <option value="Оффлайн">Оффлайн</option>
+        </select>
+        <input id="filter-city" placeholder="Город"/>
+        <button id="filterTasksBtn">Фильтровать</button>
+      </div>
+      <div id="volTasksList" style="max-height: 400px; overflow-y: auto; border: 1px solid #ddd; border-radius: 8px; padding: 10px;">
+        <!-- Здесь будут отображаться задачи -->
+      </div>
+    </div>
+    
+    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+      <button onclick="goHome()">🏠 На главную</button>
+      <button id="reregisterVolunteerBtn" style="background: #ff6b35; color: white;">🔄 Новая регистрация</button>
+    </div>
+  </div>
+
+  <!-- Экран прямого чата -->
+  <div id="screen-direct-chat" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2 id="direct-chat-title">Чат с клиентом</h2>
+    
+    <div id="direct-chat-container">
+      <div id="direct-chat-messages" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: #fafafa; text-align: left;">
+        <!-- Сообщения чата -->
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <input id="direct-chat-input" type="text" placeholder="Напишите сообщение..." style="flex: 1;"/>
+        <button id="direct-chat-send">Отправить</button>
+      </div>
+    </div>
+    <button id="back-to-cabinet">Назад в кабинет</button>
+  </div>
+
+  <script>
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+  <!-- Подключение JS файлов -->
+  <script src="js/storage.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/volunteer.js"></script>
+</body>
+</html>

@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tatani - Вход в систему</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Экран выбора действия -->
+  <div id="screen-auth-choice" class="screen active">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Добро пожаловать в Tatani!</h2>
+    <p>Войдите в существующий аккаунт или создайте новый</p>
+    
+    <div style="margin: 30px 0;">
+      <button id="show-login-btn" style="margin: 10px; padding: 15px 30px; font-size: 16px;">
+        🔑 Войти в аккаунт
+      </button>
+      <br>
+      <button id="show-register-btn" style="margin: 10px; padding: 15px 30px; font-size: 16px;">
+        ➕ Создать аккаунт
+      </button>
+    </div>
+    
+    <button id="go-home-btn" style="background: #ccc; color: #333;">🏠 На главную</button>
+  </div>
+
+  <!-- Экран входа -->
+  <div id="screen-login" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Вход в аккаунт</h2>
+    
+    <div id="login-form">
+      <input id="login-email" type="email" placeholder="Email" />
+      <input id="login-password" type="password" placeholder="Пароль" />
+      
+      <div style="margin: 10px 0;">
+        <label>
+          <input id="remember-me" type="checkbox"> Запомнить меня
+        </label>
+      </div>
+      
+      <button id="login-btn">Войти</button>
+      <button id="show-forgot-btn" style="background: #ff9800;">Забыли пароль?</button>
+      <button id="back-to-choice-1">Назад</button>
+    </div>
+  </div>
+
+  <!-- Экран регистрации -->
+  <div id="screen-register" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Создание аккаунта</h2>
+    
+    <div id="register-form">
+      <input id="register-email" type="email" placeholder="Email" />
+      <input id="register-password" type="password" placeholder="Пароль (минимум 6 символов)" />
+      <input id="register-password-confirm" type="password" placeholder="Подтвердите пароль" />
+      
+      <label for="register-user-type">Я хочу:</label>
+      <select id="register-user-type">
+        <option value="">Выберите роль</option>
+        <option value="client">Получать помощь</option>
+        <option value="volunteer">Помогать другим</option>
+      </select>
+      
+      <button id="register-btn">Создать аккаунт</button>
+      <button id="back-to-choice-2">Назад</button>
+    </div>
+  </div>
+
+  <!-- Экран подтверждения email -->
+  <div id="screen-verify" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Подтверждение email</h2>
+    
+    <p>Код подтверждения отправлен на <span id="verify-email"></span></p>
+    
+    <input id="verify-code" type="text" placeholder="Введите код из письма" maxlength="6" />
+    
+    <button id="verify-btn">Подтвердить</button>
+    <button id="resend-btn">Отправить код повторно</button>
+    <button id="back-to-choice-3">Назад</button>
+  </div>
+
+  <!-- Экран сброса пароля -->
+  <div id="screen-forgot" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Сброс пароля</h2>
+    
+    <p>Введите email для получения кода сброса</p>
+    
+    <input id="forgot-email" type="email" placeholder="Email" />
+    
+    <button id="send-reset-btn">Отправить код</button>
+    <button id="back-to-login-1">Назад к входу</button>
+  </div>
+
+  <!-- Экран ввода нового пароля -->
+  <div id="screen-reset" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Новый пароль</h2>
+    
+    <p>Введите код из письма и новый пароль</p>
+    
+    <input id="reset-code" type="text" placeholder="Код из письма" maxlength="6" />
+    <input id="reset-password" type="password" placeholder="Новый пароль" />
+    <input id="reset-password-confirm" type="password" placeholder="Подтвердите пароль" />
+    
+    <button id="reset-confirm-btn">Изменить пароль</button>
+    <button id="back-to-forgot">Назад</button>
+  </div>
+
+  <script>
+    // Глобальные переменные
+    let pendingVerificationEmail = '';
+    let pendingResetEmail = '';
+
+    // Утилиты
+    function generateId() {
+      return Date.now() + Math.random().toString(36).substr(2, 9);
+    }
+
+    function generateVerificationCode() {
+      return Math.floor(100000 + Math.random() * 900000).toString();
+    }
+
+    function hashPassword(password) {
+      let hash = 0;
+      for (let i = 0; i < password.length; i++) {
+        const char = password.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash;
+      }
+      return Math.abs(hash).toString(16);
+    }
+
+    function isValidEmail(email) {
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return emailRegex.test(email);
+    }
+
+    // Работа с пользователями
+    function saveUser(user) {
+      let users = JSON.parse(localStorage.getItem('users') || '[]');
+      const existingIndex = users.findIndex(u => u.id === user.id);
+      
+      if (existingIndex >= 0) {
+        users[existingIndex] = user;
+      } else {
+        users.push(user);
+      }
+      
+      localStorage.setItem('users', JSON.stringify(users));
+      console.log('Пользователь сохранен:', user.email);
+    }
+
+    function loadUserByEmail(email) {
+      const users = JSON.parse(localStorage.getItem('users') || '[]');
+      return users.find(u => u.email === email);
+    }
+
+    // Переключение экранов
+    function switchAuthScreen(toId) {
+      console.log('Переключение на экран:', toId);
+      
+      const currentScreen = document.querySelector('.screen.active');
+      const targetScreen = document.getElementById(toId);
+      
+      if (currentScreen) {
+        currentScreen.classList.remove('active');
+      }
+      
+      if (targetScreen) {
+        targetScreen.classList.add('active');
+        
+        // Фокус на первый input
+        const firstInput = targetScreen.querySelector('input[type="email"], input[type="text"]');
+        if (firstInput) {
+          setTimeout(() => firstInput.focus(), 100);
+        }
+      } else {
+        console.error('Экран не найден:', toId);
+      }
+    }
+
+    // Основные функции
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+
+    function showLoginForm() {
+      switchAuthScreen('screen-login');
+    }
+
+    function showRegisterForm() {
+      switchAuthScreen('screen-register');
+    }
+
+    function showAuthChoice() {
+      switchAuthScreen('screen-auth-choice');
+    }
+
+    function showForgotPassword() {
+      switchAuthScreen('screen-forgot');
+    }
+
+    // Регистрация
+    async function performRegister() {
+      console.log('🚀 Начинаем регистрацию...');
+      
+      const email = document.getElementById('register-email').value.trim();
+      const password = document.getElementById('register-password').value;
+      const passwordConfirm = document.getElementById('register-password-confirm').value;
+      const userType = document.getElementById('register-user-type').value;
+      
+      console.log('Данные регистрации:', { email, userType, passwordLength: password.length });
+      
+      // Валидация
+      if (!email || !password || !passwordConfirm || !userType) {
+        alert('Заполните все поля');
+        return;
+      }
+      
+      if (!isValidEmail(email)) {
+        alert('Некорректный email адрес');
+        return;
+      }
+      
+      if (password.length < 6) {
+        alert('Пароль должен содержать минимум 6 символов');
+        return;
+      }
+      
+      if (password !== passwordConfirm) {
+        alert('Пароли не совпадают');
+        return;
+      }
+      
+      // Проверяем существует ли пользователь
+      const existingUser = loadUserByEmail(email);
+      if (existingUser) {
+        alert('Пользователь с таким email уже существует');
+        return;
+      }
+      
+      // Создаем пользователя
+      const verificationCode = generateVerificationCode();
+      const hashedPassword = hashPassword(password);
+      
+      const newUser = {
+        id: generateId(),
+        email: email,
+        password: hashedPassword,
+        userType: userType,
+        isVerified: false,
+        verificationCode: verificationCode,
+        registrationDate: new Date().toISOString(),
+        profile: null
+      };
+      
+      saveUser(newUser);
+      
+      console.log('✅ Пользователь создан. Код подтверждения:', verificationCode);
+      
+      // Показываем код в alert
+      alert(`Ваш код подтверждения: ${verificationCode}\n\n(В реальном приложении код отправится на email)`);
+      
+      pendingVerificationEmail = email;
+      document.getElementById('verify-email').textContent = email;
+      switchAuthScreen('screen-verify');
+    }
+
+    // Вход
+    async function performLogin() {
+      console.log('🔑 Попытка входа...');
+      
+      const email = document.getElementById('login-email').value.trim();
+      const password = document.getElementById('login-password').value;
+      const rememberMe = document.getElementById('remember-me').checked;
+      
+      if (!email || !password) {
+        alert('Заполните все поля');
+        return;
+      }
+      
+      console.log('Данные входа:', { email, rememberMe });
+      
+      const user = loadUserByEmail(email);
+      
+      if (!user) {
+        alert('Пользователь не найден. Зарегистрируйтесь сначала.');
+        return;
+      }
+      
+      const hashedPassword = hashPassword(password);
+      if (user.password !== hashedPassword) {
+        alert('Неверный пароль');
+        return;
+      }
+      
+      if (!user.isVerified) {
+        alert('Email не подтвержден. Проверьте почту или запросите новый код.');
+        pendingVerificationEmail = email;
+        document.getElementById('verify-email').textContent = email;
+        switchAuthScreen('screen-verify');
+        return;
+      }
+      
+      // Создаем сессию
+      const session = {
+        userId: user.id,
+        email: user.email,
+        userType: user.userType,
+        loginTime: new Date().toISOString()
+      };
+      
+      localStorage.setItem('userSession', JSON.stringify(session));
+      
+      if (rememberMe) {
+        localStorage.setItem('rememberMe', 'true');
+      }
+      
+      console.log('✅ Вход выполнен успешно');
+      alert('Вход выполнен успешно!');
+      
+      // Перенаправляем в соответствующий кабинет
+      if (user.userType === 'client') {
+        window.location.href = 'client.html';
+      } else {
+        window.location.href = 'volunteer.html';
+      }
+    }
+
+    // Подтверждение email
+    function performVerification() {
+      console.log('✉️ Подтверждение email...');
+      
+      const code = document.getElementById('verify-code').value.trim();
+      
+      if (!code) {
+        alert('Введите код подтверждения');
+        return;
+      }
+      
+      console.log('Проверка кода:', code, 'для email:', pendingVerificationEmail);
+      
+      const user = loadUserByEmail(pendingVerificationEmail);
+      
+      if (!user) {
+        alert('Пользователь не найден');
+        return;
+      }
+      
+      if (user.verificationCode !== code) {
+        alert('Неверный код подтверждения');
+        console.log('Ожидался код:', user.verificationCode, 'Введен код:', code);
+        return;
+      }
+      
+      // Подтверждаем пользователя
+      user.isVerified = true;
+      user.verificationCode = null;
+      saveUser(user);
+      
+      console.log('✅ Email подтвержден');
+      alert('Email подтвержден! Теперь вы можете войти в систему.');
+      showLoginForm();
+    }
+
+    // Повторная отправка кода
+    async function resendVerificationCode() {
+      if (!pendingVerificationEmail) {
+        alert('Email не определен');
+        return;
+      }
+      
+      const user = loadUserByEmail(pendingVerificationEmail);
+      if (user) {
+        const newCode = generateVerificationCode();
+        user.verificationCode = newCode;
+        saveUser(user);
+        
+        console.log('🔄 Новый код создан:', newCode);
+        alert(`Новый код подтверждения: ${newCode}`);
+      }
+    }
+
+    // Сброс пароля
+    async function sendResetCode() {
+      const email = document.getElementById('forgot-email').value.trim();
+      
+      if (!email) {
+        alert('Введите email');
+        return;
+      }
+      
+      const user = loadUserByEmail(email);
+      
+      if (!user) {
+        alert('Пользователь с таким email не найден');
+        return;
+      }
+      
+      const resetCode = generateVerificationCode();
+      user.resetCode = resetCode;
+      user.resetCodeExpires = new Date(Date.now() + 30 * 60 * 1000).toISOString();
+      
+      saveUser(user);
+      
+      console.log('🔐 Код сброса создан:', resetCode);
+      alert(`Код сброса пароля: ${resetCode}\n\n(В реальном приложении отправится на email)`);
+      
+      pendingResetEmail = email;
+      switchAuthScreen('screen-reset');
+    }
+
+    // Подтверждение сброса пароля
+    function performPasswordReset() {
+      const code = document.getElementById('reset-code').value.trim();
+      const password = document.getElementById('reset-password').value;
+      const passwordConfirm = document.getElementById('reset-password-confirm').value;
+      
+      if (!code || !password || !passwordConfirm) {
+        alert('Заполните все поля');
+        return;
+      }
+      
+      if (password !== passwordConfirm) {
+        alert('Пароли не совпадают');
+        return;
+      }
+      
+      if (password.length < 6) {
+        alert('Пароль должен содержать минимум 6 символов');
+        return;
+      }
+      
+      const user = loadUserByEmail(pendingResetEmail);
+      
+      if (!user || !user.resetCode) {
+        alert('Код сброса не найден');
+        return;
+      }
+      
+      if (user.resetCode !== code) {
+        alert('Неверный код сброса');
+        return;
+      }
+      
+      // Проверяем срок действия кода
+      if (new Date() > new Date(user.resetCodeExpires)) {
+        alert('Код сброса истек');
+        return;
+      }
+      
+      // Устанавливаем новый пароль
+      user.password = hashPassword(password);
+      user.resetCode = null;
+      user.resetCodeExpires = null;
+      
+      saveUser(user);
+      
+      console.log('🔐 Пароль изменен для:', user.email);
+      alert('Пароль успешно изменен! Теперь вы можете войти.');
+      showLoginForm();
+    }
+
+    // Инициализация после загрузки DOM
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('📱 Login page загружена');
+      console.log('👥 Пользователи в localStorage:', JSON.parse(localStorage.getItem('users') || '[]').length);
+      
+      // Навигационные кнопки
+      document.getElementById('go-home-btn').addEventListener('click', goHome);
+      document.getElementById('show-login-btn').addEventListener('click', showLoginForm);
+      document.getElementById('show-register-btn').addEventListener('click', showRegisterForm);
+      document.getElementById('show-forgot-btn').addEventListener('click', showForgotPassword);
+      
+      // Кнопки "Назад"
+      document.getElementById('back-to-choice-1').addEventListener('click', showAuthChoice);
+      document.getElementById('back-to-choice-2').addEventListener('click', showAuthChoice);
+      document.getElementById('back-to-choice-3').addEventListener('click', showAuthChoice);
+      document.getElementById('back-to-login-1').addEventListener('click', showLoginForm);
+      document.getElementById('back-to-forgot').addEventListener('click', showForgotPassword);
+      
+      // Основные действия
+      document.getElementById('register-btn').addEventListener('click', performRegister);
+      document.getElementById('login-btn').addEventListener('click', performLogin);
+      document.getElementById('verify-btn').addEventListener('click', performVerification);
+      document.getElementById('resend-btn').addEventListener('click', resendVerificationCode);
+      document.getElementById('send-reset-btn').addEventListener('click', sendResetCode);
+      document.getElementById('reset-confirm-btn').addEventListener('click', performPasswordReset);
+      
+      console.log('✅ Все обработчики настроены');
+      
+      // Обработка Enter
+      document.addEventListener('keypress', function(e) {
+        if (e.key === 'Enter') {
+          const activeScreen = document.querySelector('.screen.active');
+          if (!activeScreen) return;
+          
+          const screenId = activeScreen.id;
+          
+          switch (screenId) {
+            case 'screen-login':
+              performLogin();
+              break;
+            case 'screen-register':
+              performRegister();
+              break;
+            case 'screen-verify':
+              performVerification();
+              break;
+            case 'screen-forgot':
+              sendResetCode();
+              break;
+            case 'screen-reset':
+              performPasswordReset();
+              break;
+          }
+        }
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tatani - Кабинет клиента</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Экран ввода имени -->
+  <div id="screen-client-name" class="screen active">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Как вас зовут?</h2>
+    <input id="clientNameInput" placeholder="Введите имя" />
+    <button id="validateClientNameBtn">Продолжить</button>
+    <button onclick="goHome()">🏠 На главную</button>
+  </div>
+
+  <!-- Экран ввода телефона -->
+  <div id="screen-client-phone" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Введите номер телефона</h2>
+    <input id="clientPhoneInput" placeholder="+7(___) ___-__-__" />
+    <button id="validateClientPhoneBtn">Продолжить</button>
+    <button id="backBtn">Назад</button>
+  </div>
+
+  <!-- Экран описания задачи -->
+  <div id="screen-client-task" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Опишите задачу</h2>
+    
+    <label for="clientCategory">Категория</label>
+    <select id="clientCategory">
+      <option value="Покупка">Покупка</option>
+      <option value="Доставка">Доставка</option>
+      <option value="Общение">Общение</option>
+      <option value="Помощь по дому">Помощь по дому</option>
+    </select><br>
+
+    <label for="clientFormat">Формат</label>
+    <select id="clientFormat">
+      <option value="Оффлайн">Оффлайн</option>
+      <option value="Онлайн">Онлайн</option>
+      <option value="Оба">Оба</option>
+    </select><br>
+
+    <label for="clientCity">Город</label>
+    <input id="clientCity" placeholder="Город" /><br>
+    
+    <label for="taskInput">Описание задачи</label>
+    <textarea id="taskInput" rows="3" placeholder="Опишите проблему..."></textarea><br>
+    <input type="file" id="taskPhoto"/><br>
+    <button id="saveTaskAndNextBtn">Создать заявку</button>
+    <button id="backBtn">Назад</button>
+  </div>
+
+  <!-- Экран "Спасибо" -->
+  <div id="screen-client-done" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Спасибо! Ваша заявка создана 🧡</h2>
+    <p>Волонтёры увидят вашу заявку и смогут откликнуться</p>
+    <button id="showChatBtn">Перейти в кабинет</button>
+    <button id="backBtn">Назад</button>
+  </div>
+
+  <!-- Кабинет клиента -->
+  <div id="screen-client-cabinet" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2>Ваши заявки</h2>
+    
+    <!-- Список заявок клиента -->
+    <div id="client-requests-list" style="margin-bottom: 20px;">
+      <!-- Здесь будут отображаться заявки -->
+    </div>
+    
+    <!-- Чат с ИИ -->
+    <div style="margin-top: 30px;">
+      <h3>Чат с ИИ помощником</h3>
+      <div id="chat" style="height: 200px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: #fafafa; text-align: left;"></div>
+      <div style="display: flex; gap: 10px;">
+        <input id="input" type="text" placeholder="Задайте вопрос..." style="flex: 1;"/>
+        <button id="sendBtn">Отправить</button>
+        <button id="clientVoiceBtn">🎤</button>
+      </div>
+    </div>
+    
+    <div style="margin-top: 20px; display: flex; gap: 10px; justify-content: center; flex-wrap: wrap;">
+      <button onclick="goHome()">🏠 На главную</button>
+      <button id="reregisterClientBtn" style="background: #ff6b35; color: white;">🔄 Новая регистрация</button>
+    </div>
+  </div>
+
+  <!-- Экран прямого чата -->
+  <div id="screen-direct-chat" class="screen">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h2 id="direct-chat-title">Чат с волонтёром</h2>
+    
+    <div id="direct-chat-container">
+      <div id="direct-chat-messages" style="height: 300px; overflow-y: auto; border: 1px solid #ccc; padding: 10px; margin: 10px 0; background: #fafafa; text-align: left;">
+        <!-- Сообщения чата -->
+      </div>
+      <div style="display: flex; gap: 10px;">
+        <input id="direct-chat-input" type="text" placeholder="Напишите сообщение..." style="flex: 1;"/>
+        <button id="direct-chat-send">Отправить</button>
+      </div>
+    </div>
+    <button id="back-to-cabinet">Назад в кабинет</button>
+  </div>
+
+  <script>
+    function goHome() {
+      window.location.href = 'index.html';
+    }
+  </script>
+
+  <!-- Подключение JS файлов -->
+  <script src="js/storage.js"></script>
+  <script src="js/chat.js"></script>
+  <script src="js/client.js"></script>
+</body>
+</html>

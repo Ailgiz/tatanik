@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+  <meta charset="UTF-8">
+  <title>Tatani - Платформа взаимопомощи</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+  <!-- Главный экран -->
+  <div class="screen active">
+    <img class="avatar" src="assets/avatar-tatani.jpeg" alt="Татаник"/>
+    <h1>Добро пожаловать в Tatani!</h1>
+    <h2>Платформа взаимопомощи</h2>
+    <p>Здесь люди помогают друг другу решать различные задачи</p>
+    
+    <div id="auth-info" style="margin: 20px 0;">
+      <!-- Информация об авторизации будет добавлена здесь -->
+    </div>
+    
+    <div style="margin: 30px 0;">
+      <button onclick="goToAuth()" style="margin: 10px; padding: 15px 30px; font-size: 18px; background: #4CAF50;">
+        🔑 Войти / Регистрация
+      </button>
+      <br>
+      <button onclick="showGuestOptions()" style="margin: 10px; padding: 15px 30px; font-size: 16px; background: #2196F3;">
+        👀 Просмотр без регистрации
+      </button>
+    </div>
+    
+    <div id="guest-options" style="display: none; margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 10px;">
+      <p>Вы можете посмотреть интерфейс без регистрации:</p>
+      <button onclick="goToClient()" style="margin: 5px;">🙋‍♀️ Посмотреть интерфейс клиента</button>
+      <button onclick="goToVolunteer()" style="margin: 5px;">🤝 Посмотреть интерфейс волонтёра</button>
+    </div>
+    
+    <p style="font-size: 14px; color: #666; margin-top: 40px;">
+      Платформа для взаимопомощи между людьми
+    </p>
+  </div>
+
+  <script>
+    function goToAuth() {
+      window.location.href = 'login.html';
+    }
+    
+    function goToClient() {
+      window.location.href = 'client.html';
+    }
+    
+    function goToVolunteer() {
+      window.location.href = 'volunteer.html';
+    }
+    
+    function showGuestOptions() {
+      const options = document.getElementById('guest-options');
+      options.style.display = options.style.display === 'none' ? 'block' : 'none';
+    }
+    
+    // Проверяем авторизацию при загрузке
+    document.addEventListener('DOMContentLoaded', function() {
+      const authInfo = document.getElementById('auth-info');
+      
+      // Если пользователь уже авторизован
+      const session = localStorage.getItem('userSession');
+      if (session) {
+        const sessionData = JSON.parse(session);
+        const userTypeText = sessionData.userType === 'client' ? 'клиент' : 'волонтёр';
+        
+        authInfo.innerHTML = `
+          <div style="background: #e8f5e8; padding: 15px; border-radius: 10px; border: 1px solid #4CAF50;">
+            <p style="margin: 0; color: #2e7d32;">
+              Вы авторизованы как <strong>${userTypeText}</strong><br>
+              Email: ${sessionData.email}
+            </p>
+            <button onclick="goToCabinet()" style="margin: 10px 5px 0 0; padding: 8px 16px; background: #4CAF50; color: white; border: none; border-radius: 5px;">
+              🏠 Перейти в кабинет
+            </button>
+            <button onclick="logout()" style="margin: 10px 0 0 5px; padding: 8px 16px; background: #f44336; color: white; border: none; border-radius: 5px;">
+              🚪 Выйти
+            </button>
+          </div>
+        `;
+      }
+    });
+    
+    function goToCabinet() {
+      const session = JSON.parse(localStorage.getItem('userSession'));
+      if (session.userType === 'client') {
+        window.location.href = 'client.html';
+      } else {
+        window.location.href = 'volunteer.html';
+      }
+    }
+    
+    function logout() {
+      if (confirm('Вы уверены, что хотите выйти?')) {
+        localStorage.removeItem('userSession');
+        localStorage.removeItem('rememberMe');
+        location.reload();
+      }
+    }
+  </script>
+
+  <!-- Подключение JS файлов -->
+  <script src="js/storage.js"></script>
+  <script src="js/auth.js"></script>
+</body>
+</html>
